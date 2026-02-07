@@ -1,0 +1,170 @@
+{
+  "project_info": {
+    "project_number": "887142970943",
+    "project_id": "valeapp-flutter",
+    "storage_bucket": "valeapp-flutter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887142970943:android:64e234ede6039702a3ea8a",
+        "android_client_info": {
+          "package_name": "com.example.app_tuvale"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "887142970943-hmj99i6qp6m19ef3gtgeece6c47atbpr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.app_tuvale",
+            "certificate_hash": "65407b57a0566a550e143887a4e80bce585a93e4"
+          }
+        },
+        {
+          "client_id": "887142970943-826eioi2cch3639m4i75gl96i146vpo9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-m-lZLBVe8ze2G4Q5GuCvJsq_k7N02kg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "887142970943-826eioi2cch3639m4i75gl96i146vpo9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "887142970943-dafldc8l47ja4fs90klll0l30mk4165c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.valeappflutter.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887142970943:android:419686e73b775f4ea3ea8a",
+        "android_client_info": {
+          "package_name": "com.example.ofertas_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "887142970943-826eioi2cch3639m4i75gl96i146vpo9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-m-lZLBVe8ze2G4Q5GuCvJsq_k7N02kg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "887142970943-826eioi2cch3639m4i75gl96i146vpo9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "887142970943-dafldc8l47ja4fs90klll0l30mk4165c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.valeappflutter.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887142970943:android:c2bc8c700d199bc2a3ea8a",
+        "android_client_info": {
+          "package_name": "com.tuvale.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "887142970943-0b6a38fuk52odn68va2hf4hqbonaqdqr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tuvale.admin",
+            "certificate_hash": "65407b57a0566a550e143887a4e80bce585a93e4"
+          }
+        },
+        {
+          "client_id": "887142970943-826eioi2cch3639m4i75gl96i146vpo9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-m-lZLBVe8ze2G4Q5GuCvJsq_k7N02kg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "887142970943-826eioi2cch3639m4i75gl96i146vpo9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "887142970943-dafldc8l47ja4fs90klll0l30mk4165c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.valeappflutter.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887142970943:android:3d20f9225bf20bc2a3ea8a",
+        "android_client_info": {
+          "package_name": "com.valeappflutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "887142970943-826eioi2cch3639m4i75gl96i146vpo9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-m-lZLBVe8ze2G4Q5GuCvJsq_k7N02kg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "887142970943-826eioi2cch3639m4i75gl96i146vpo9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "887142970943-dafldc8l47ja4fs90klll0l30mk4165c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.valeappflutter.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
