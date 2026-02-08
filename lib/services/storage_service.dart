@@ -15,7 +15,12 @@ class StorageService {
 
   /// Pick an image from Gallery or Camera
   Future<XFile?> pickImage({required ImageSource source}) async {
-    return await _picker.pickImage(source: source, imageQuality: 80);
+    return await _picker.pickImage(
+      source: source,
+      imageQuality: 80,
+      maxWidth: 1024,
+      maxHeight: 1024,
+    );
   }
 
   /// Upload image file to Firebase Storage and return download URL

@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/coupon_model_source.dart';
 import '../models/store_model_source.dart';
+import '../models/company_model.dart';
+import '../models/company_model_source.dart';
 import '../models/user_model.dart';
 
 final firestoreServiceProvider = Provider<FirestoreService>((ref) {
@@ -20,6 +22,14 @@ final companyStoresProvider = StreamProvider.family<List<StoreModel>, String>((r
   return ref.watch(firestoreServiceProvider).getStoresStream(companyId);
 });
 
+final companyProfileProvider = StreamProvider.family<CompanyEntity?, String>((ref, companyId) {
+  return ref.watch(firestoreServiceProvider).getCompanyStream(companyId);
+});
+
+final companyUsersProvider = StreamProvider.family<List<AppUser>, String>((ref, companyId) {
+  return ref.watch(firestoreServiceProvider).getCompanyUsersStream(companyId);
+});
+
 class FirestoreService {
   final FirebaseFirestore _firestore;
 
@@ -35,8 +45,22 @@ class FirestoreService {
     });
   }
 
+  Stream<List<AppUser>> getCompanyUsersStream(String companyId) {
+    return _firestore
+        .collection('users')
+        .where('companyId', isEqualTo: companyId)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => AppUser.fromMap(doc.id, doc.data())).toList();
+    });
+  }
+
   Future<void> createOrUpdateUser(AppUser user) async {
     await _firestore.collection('users').doc(user.id).set(user.toMap(), SetOptions(merge: true));
+  }
+
+  Future<void> toggleUserStatus(String uid, bool isActive) async {
+    await _firestore.collection('users').doc(uid).update({'isActive': isActive});
   }
 
   // Coupon Methods
@@ -87,6 +111,33 @@ class FirestoreService {
     });
   }
 
+
+  // Company Methods
+  Stream<CompanyEntity?> getCompanyStream(String companyId) {
+    return _firestore.collection('companies').doc(companyId).snapshots().map((doc) {
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data()!;
+        return CompanyEntity(
+          id: doc.id,
+          name: data['name'] ?? '',
+          category: StoreCategory.fromString(data['category'] ?? ''),
+          logoUrl: data['logoUrl'],
+          isFeatured: data['isFeatured'] ?? false,
+          priority: data['priority'] ?? 0,
+        );
+      }
+      return null;
+    });
+  }
+
+  Future<void> updateCompanyLogo(String companyId, String logoUrl) async {
+    await _firestore.collection('companies').doc(companyId).update({'logoUrl': logoUrl});
+  }
+
+  Future<void> updateCompany(CompanyEntity company) async {
+    final model = CompanyModel.fromEntity(company);
+    await _firestore.collection('companies').doc(company.id).update(model.toFirestore());
+  }
 
   // Store Methods
   Stream<List<StoreModel>> getStoresStream(String companyId) {

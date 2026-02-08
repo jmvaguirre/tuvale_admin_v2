@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/auth_service.dart';
+import '../services/firestore_service.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -38,6 +39,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
+
+      // Check if user is blocked
+      final user = authService.currentUser;
+      if (user != null) {
+        final firestoreService = ref.read(firestoreServiceProvider);
+        // We use 'first' to get the current snapshot value
+        final userProfile = await firestoreService.getUserStream(user.uid).first;
+        
+        if (userProfile != null && !userProfile.isActive) {
+           await authService.signOut();
+           throw Exception('Esta cuenta ha sido bloqueada por un administrador.');
+        }
+      }
     } catch (e) {
       setState(() {
         _errorMessage = "Error de autenticación: Verifique sus credenciales";

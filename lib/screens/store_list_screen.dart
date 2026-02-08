@@ -66,15 +66,17 @@ class StoreListScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, s) => Center(child: Text('Error: $e')),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const StoreFormScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: userProfileAsync.valueOrNull?.role == 'admin' 
+        ? FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const StoreFormScreen()),
+              );
+            },
+            child: const Icon(Icons.add),
+          )
+        : null,
     );
   }
 }

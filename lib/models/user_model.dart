@@ -3,12 +3,14 @@ class AppUser {
   final String email;
   final String? companyId;
   final String role;
+  final bool isActive;
 
   const AppUser({
     required this.id,
     required this.email,
     this.companyId,
     this.role = 'user',
+    this.isActive = true,
   });
 
   factory AppUser.fromMap(String id, Map<String, dynamic> data) {
@@ -17,6 +19,7 @@ class AppUser {
       email: data['email'] ?? '',
       companyId: data['companyId'],
       role: data['role'] ?? 'user',
+      isActive: data['isActive'] ?? true, // Default true for existing users
     );
   }
 
@@ -25,6 +28,7 @@ class AppUser {
       'email': email,
       'companyId': companyId,
       'role': role,
+      'isActive': isActive,
     };
   }
 }

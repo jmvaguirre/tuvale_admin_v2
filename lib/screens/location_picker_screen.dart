@@ -57,7 +57,11 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     }
 
     try {
-      final position = await Geolocator.getCurrentPosition();
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: const Duration(seconds: 10),
+      );
+      
       if (mounted) {
         setState(() {
           _currentLocation = LatLng(position.latitude, position.longitude);
@@ -66,7 +70,13 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         _mapController?.animateCamera(CameraUpdate.newLatLng(_currentLocation));
       }
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
+      debugPrint('Error getting location: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se pudo obtener la ubicación actual')),
+        );
+      }
     }
   }
 
