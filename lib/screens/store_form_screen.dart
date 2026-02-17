@@ -22,6 +22,7 @@ class _StoreFormScreenState extends ConsumerState<StoreFormScreen> {
   final _branchNameController = TextEditingController();
   final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _businessHoursController = TextEditingController();
   final _latController = TextEditingController();
   final _lngController = TextEditingController();
   
@@ -36,6 +37,7 @@ class _StoreFormScreenState extends ConsumerState<StoreFormScreen> {
       _branchNameController.text = s.branchName;
       _addressController.text = s.address;
       _phoneController.text = s.phone ?? '';
+      _businessHoursController.text = s.businessHours ?? '';
       _latController.text = s.latitude.toString();
       _lngController.text = s.longitude.toString();
       _isActive = s.isActive;
@@ -47,6 +49,7 @@ class _StoreFormScreenState extends ConsumerState<StoreFormScreen> {
     _branchNameController.dispose();
     _addressController.dispose();
     _phoneController.dispose();
+    _businessHoursController.dispose();
     _latController.dispose();
     _lngController.dispose();
     super.dispose();
@@ -94,6 +97,7 @@ class _StoreFormScreenState extends ConsumerState<StoreFormScreen> {
         latitude: double.tryParse(_latController.text) ?? 0.0,
         longitude: double.tryParse(_lngController.text) ?? 0.0,
         phone: _phoneController.text.isEmpty ? null : _phoneController.text.trim(),
+        businessHours: _businessHoursController.text.isEmpty ? null : _businessHoursController.text.trim(),
         isActive: _isActive,
       );
 
@@ -157,6 +161,15 @@ class _StoreFormScreenState extends ConsumerState<StoreFormScreen> {
                         controller: _phoneController,
                         decoration: const InputDecoration(labelText: 'Teléfono (Opcional)', prefixIcon: Icon(Icons.phone_outlined)),
                         keyboardType: TextInputType.phone,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _businessHoursController,
+                        decoration: const InputDecoration(
+                          labelText: 'Horario de Atención (Opcional)',
+                          hintText: 'Ej. Lun-Vie 8:00-18:00, Sáb 9:00-13:00',
+                          prefixIcon: Icon(Icons.access_time),
+                        ),
                       ),
                     ],
                   ),

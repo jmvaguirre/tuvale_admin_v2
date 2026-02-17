@@ -253,12 +253,19 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                                  validator: (v) => v == null || v.isEmpty ? 'Requerido' : null,
                                ),
                                const SizedBox(height: 16),
-                               DropdownButtonFormField<StoreCategory>(
-                                 value: _selectedCategory,
-                                 decoration: const InputDecoration(labelText: 'Categoría'),
-                                 items: StoreCategory.values.map((c) {
-                                   return DropdownMenuItem(value: c, child: Text(c.label));
-                                 }).toList(),
+                                DropdownButtonFormField<StoreCategory>(
+                                  value: _selectedCategory,
+                                  decoration: const InputDecoration(labelText: 'Categoría'),
+                                  isExpanded: true,
+                                  items: StoreCategory.values.map((c) {
+                                    return DropdownMenuItem(
+                                      value: c,
+                                      child: Text(
+                                        c.label,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    );
+                                  }).toList(),
                                  onChanged: (v) {
                                    if (v != null) setState(() => _selectedCategory = v);
                                  },

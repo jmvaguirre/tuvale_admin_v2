@@ -12,6 +12,7 @@ class StoreModel {
   final String? phone;
   final bool isActive;
   final String? qrUrl;
+  final String? businessHours;
 
   const StoreModel({
     required this.id,
@@ -23,6 +24,7 @@ class StoreModel {
     this.phone,
     this.isActive = true,
     this.qrUrl,
+    this.businessHours,
   });
 
   /// Convert from Firestore document
@@ -38,6 +40,7 @@ class StoreModel {
       phone: data['phone'],
       isActive: data['isActive'] ?? true,
       qrUrl: data['qrUrl'],
+      businessHours: data['businessHours'],
     );
   }
 
@@ -52,6 +55,7 @@ class StoreModel {
       if (phone != null) 'phone': phone,
       'isActive': isActive,
       if (qrUrl != null) 'qrUrl': qrUrl,
+      if (businessHours != null) 'businessHours': businessHours,
     };
   }
 
@@ -67,6 +71,7 @@ class StoreModel {
       phone: phone,
       isActive: isActive,
       qrUrl: qrUrl,
+      businessHours: businessHours,
     );
   }
 
@@ -82,6 +87,7 @@ class StoreModel {
       phone: entity.phone,
       isActive: entity.isActive,
       qrUrl: entity.qrUrl,
+      businessHours: entity.businessHours,
     );
   }
 }

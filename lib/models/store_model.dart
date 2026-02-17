@@ -11,6 +11,7 @@ class StoreEntity {
   final String? phone;
   final bool isActive;
   final String? qrUrl;
+  final String? businessHours;
 
   const StoreEntity({
     required this.id,
@@ -22,6 +23,7 @@ class StoreEntity {
     this.phone,
     this.isActive = true,
     this.qrUrl,
+    this.businessHours,
   });
 
   /// Get full store name (Company - Branch)

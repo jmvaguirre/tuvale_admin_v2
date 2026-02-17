@@ -1,10 +1,13 @@
 /// Store category enum
 enum StoreCategory {
   supermercado('Supermercado', 'supermercado'),
-  farmacia('Farmacia', 'farmacia'),
+  salud('Salud y Bienestar', 'salud'),
   restaurante('Restaurante', 'restaurante'),
   moda('Moda', 'moda'),
-  ferreteria('Ferretería', 'ferreteria');
+  hogar('Hogar y Construcción', 'hogar'),
+  belleza('Belleza y Cuidado Personal', 'belleza'),
+  tecnologia('Tecnología', 'tecnologia'),
+  entretenimiento('Entretenimiento', 'entretenimiento');
 
   final String label;
   final String value;
