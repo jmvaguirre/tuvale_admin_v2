@@ -16,10 +16,11 @@ class CouponModel {
   final int stock;
   final List<String> enabledStoreIds;
   final bool isActive;
-  final String barcode;
+  final String? barcode;
   final bool isHero;
   final List<String> tags;
   final int viewCount;
+  final String? qrUrl;
 
   const CouponModel({
     required this.id,
@@ -35,10 +36,11 @@ class CouponModel {
     required this.stock,
     required this.enabledStoreIds,
     this.isActive = true,
-    required this.barcode,
+    this.barcode,
     this.isHero = false,
     this.tags = const [],
     this.viewCount = 0,
+    this.qrUrl,
   });
 
   /// Convert from Firestore document
@@ -58,10 +60,11 @@ class CouponModel {
       stock: data['stock'] ?? 0,
       enabledStoreIds: List<String>.from(data['enabledStoreIds'] ?? []),
       isActive: data['isActive'] ?? true,
-      barcode: data['barcode'] ?? '',
+      barcode: data['barcode'],
       isHero: data['isHero'] ?? false,
       tags: List<String>.from(data['tags'] ?? []),
       viewCount: data['viewCount'] ?? 0,
+      qrUrl: data['qrUrl'],
     );
   }
 
@@ -80,10 +83,11 @@ class CouponModel {
       'stock': stock,
       'enabledStoreIds': enabledStoreIds,
       'isActive': isActive,
-      'barcode': barcode,
+      if (barcode != null && barcode!.isNotEmpty) 'barcode': barcode,
       'isHero': isHero,
       'tags': tags,
       'viewCount': viewCount,
+      if (qrUrl != null) 'qrUrl': qrUrl,
     };
   }
 
@@ -107,6 +111,7 @@ class CouponModel {
       isHero: isHero,
       tags: tags,
       viewCount: viewCount,
+      qrUrl: qrUrl,
     );
   }
 
@@ -130,6 +135,7 @@ class CouponModel {
       isHero: entity.isHero,
       tags: entity.tags,
       viewCount: entity.viewCount,
+      qrUrl: entity.qrUrl,
     );
   }
 }

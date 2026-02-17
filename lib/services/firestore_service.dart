@@ -5,6 +5,8 @@ import '../models/store_model_source.dart';
 import '../models/company_model.dart';
 import '../models/company_model_source.dart';
 import '../models/user_model.dart';
+import '../utils/qr_generator.dart';
+import 'storage_service.dart';
 
 final firestoreServiceProvider = Provider<FirestoreService>((ref) {
   return FirestoreService(FirebaseFirestore.instance);
@@ -37,7 +39,7 @@ class FirestoreService {
 
   // User Methods
   Stream<AppUser?> getUserStream(String uid) {
-    return _firestore.collection('users').doc(uid).snapshots().map((doc) {
+    return _firestore.collection('admin_users').doc(uid).snapshots().map((doc) {
       if (doc.exists && doc.data() != null) {
         return AppUser.fromMap(doc.id, doc.data()!);
       }
@@ -47,7 +49,7 @@ class FirestoreService {
 
   Stream<List<AppUser>> getCompanyUsersStream(String companyId) {
     return _firestore
-        .collection('users')
+        .collection('admin_users')
         .where('companyId', isEqualTo: companyId)
         .snapshots()
         .map((snapshot) {
@@ -56,11 +58,11 @@ class FirestoreService {
   }
 
   Future<void> createOrUpdateUser(AppUser user) async {
-    await _firestore.collection('users').doc(user.id).set(user.toMap(), SetOptions(merge: true));
+    await _firestore.collection('admin_users').doc(user.id).set(user.toMap(), SetOptions(merge: true));
   }
 
   Future<void> toggleUserStatus(String uid, bool isActive) async {
-    await _firestore.collection('users').doc(uid).update({'isActive': isActive});
+    await _firestore.collection('admin_users').doc(uid).update({'isActive': isActive});
   }
 
   // Coupon Methods
@@ -74,11 +76,45 @@ class FirestoreService {
     });
   }
 
-  Future<void> addCoupon(CouponModel coupon) async {
-    // We remove ID from map becase it is auto-generated or set in docRef
-    // But coupon.toFirestore() might include data we want.
-    // Ideally we generate ID first.
-    await _firestore.collection('coupons').doc(coupon.id).set(coupon.toFirestore());
+  Future<void> addCoupon(CouponModel coupon, {required StorageService storageService}) async {
+    // 1. Generate QR Code
+    String? qrUrl;
+    try {
+      final qrBytes = await QrGenerator.generateQrBytes(coupon.id);
+      if (qrBytes != null) {
+        // 2. Upload to Storage
+        qrUrl = await storageService.uploadQrCode(
+          data: qrBytes,
+          path: 'coupons/qr_codes/${coupon.id}.png',
+        );
+      }
+    } catch (e) {
+      print('Error generating/uploading QR: $e');
+    }
+
+    // 3. Save to Firestore with QR URL
+    final couponWithQr = CouponModel(
+      id: coupon.id,
+      companyId: coupon.companyId,
+      productName: coupon.productName,
+      description: coupon.description,
+      originalPrice: coupon.originalPrice,
+      discountedPrice: coupon.discountedPrice,
+      discountPercentage: coupon.discountPercentage,
+      imageUrl: coupon.imageUrl,
+      validFrom: coupon.validFrom,
+      validUntil: coupon.validUntil,
+      stock: coupon.stock,
+      enabledStoreIds: coupon.enabledStoreIds,
+      isActive: coupon.isActive,
+      barcode: coupon.barcode,
+      isHero: coupon.isHero, // Ensure this property exists in your model if used
+      tags: coupon.tags,
+      viewCount: coupon.viewCount,
+      qrUrl: qrUrl,
+    );
+
+    await _firestore.collection('coupons').doc(coupon.id).set(couponWithQr.toFirestore());
   }
 
   Future<void> updateCoupon(CouponModel coupon) async {
@@ -102,11 +138,12 @@ class FirestoreService {
       'createdAt': FieldValue.serverTimestamp(),
     });
 
-    // 2. Create User Profile linked to Company
-    await _firestore.collection('users').doc(uid).set({
+    // 2. Create Admin User Profile linked to Company
+    await _firestore.collection('admin_users').doc(uid).set({
       'email': email,
       'role': 'admin',
       'companyId': newCompanyId,
+      'isActive': true,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
@@ -116,15 +153,9 @@ class FirestoreService {
   Stream<CompanyEntity?> getCompanyStream(String companyId) {
     return _firestore.collection('companies').doc(companyId).snapshots().map((doc) {
       if (doc.exists && doc.data() != null) {
-        final data = doc.data()!;
-        return CompanyEntity(
-          id: doc.id,
-          name: data['name'] ?? '',
-          category: StoreCategory.fromString(data['category'] ?? ''),
-          logoUrl: data['logoUrl'],
-          isFeatured: data['isFeatured'] ?? false,
-          priority: data['priority'] ?? 0,
-        );
+        // Use CompanyModel to properly map all fields
+        final model = CompanyModel.fromFirestore(doc);
+        return model.toEntity();
       }
       return null;
     });
@@ -150,8 +181,36 @@ class FirestoreService {
     });
   }
 
-  Future<void> addStore(StoreModel store) async {
-    await _firestore.collection('stores').doc(store.id).set(store.toFirestore());
+  Future<void> addStore(StoreModel store, {required StorageService storageService}) async {
+    // 1. Generate QR Code with branch name
+    String? qrUrl;
+    try {
+      final qrBytes = await QrGenerator.generateQrBytesWithText(store.id, store.branchName);
+      if (qrBytes != null) {
+        // 2. Upload to Storage
+        qrUrl = await storageService.uploadQrCode(
+          data: qrBytes,
+          path: 'stores/qr_codes/${store.id}.png',
+        );
+      }
+    } catch (e) {
+      print('Error generating/uploading store QR: $e');
+    }
+
+    // 3. Create store with QR URL
+    final storeWithQr = StoreModel(
+      id: store.id,
+      companyId: store.companyId,
+      branchName: store.branchName,
+      address: store.address,
+      latitude: store.latitude,
+      longitude: store.longitude,
+      phone: store.phone,
+      isActive: store.isActive,
+      qrUrl: qrUrl,
+    );
+
+    await _firestore.collection('stores').doc(store.id).set(storeWithQr.toFirestore());
   }
 
   Future<void> updateStore(StoreModel store) async {

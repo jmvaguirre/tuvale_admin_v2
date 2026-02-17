@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'package:gal/gal.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
 import '../models/coupon_model_source.dart';
@@ -25,6 +27,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _downloadQr(BuildContext context, CouponModel coupon) async {
+    if (coupon.qrUrl == null) return;
+    try {
+      // 1. Download bytes
+      final response = await http.get(Uri.parse(coupon.qrUrl!));
+      if (response.statusCode != 200) throw Exception('Error downloading QR');
+
+      // 2. Save to gallery
+      // GAL uses 'putImageBytes' to save simple bytes as an image
+      await Gal.putImageBytes(
+        response.bodyBytes,
+        name: 'qr_${coupon.id}',
+      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Código QR guardado en la galería')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al guardar QR: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   @override
@@ -61,7 +91,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(authServiceProvider).signOut(),
+            onPressed: () async {
+              // Show confirmation dialog
+              final shouldLogout = await showDialog<bool>(
+                context: context,
+                builder: (dialogContext) => AlertDialog(
+                  title: const Text('Cerrar Sesión'),
+                  content: const Text('¿Estás seguro que deseas cerrar sesión?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext, false),
+                      child: const Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext, true),
+                      child: const Text('Cerrar Sesión'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (shouldLogout == true && mounted) {
+                // Invalidate all providers to clear cache
+                ref.invalidate(userProfileProvider);
+                ref.invalidate(companyCouponsProvider);
+                ref.invalidate(companyStoresProvider);
+                ref.invalidate(companyProfileProvider);
+                ref.invalidate(companyUsersProvider);
+                
+                // Sign out
+                await ref.read(authServiceProvider).signOut();
+              }
+            },
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -229,22 +290,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                       overflow: TextOverflow.ellipsis,
                                                     ),
                                                   ),
-                                                  Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                    decoration: BoxDecoration(
-                                                      color: coupon.isActive ? Colors.green.shade100 : Colors.grey.shade200,
-                                                      borderRadius: BorderRadius.circular(8),
+                                                  if (coupon.qrUrl != null)
+                                                    PopupMenuButton<String>(
+                                                      icon: const Icon(Icons.more_vert),
+                                                      onSelected: (value) {
+                                                        if (value == 'download_qr') {
+                                                          _downloadQr(context, coupon);
+                                                        }
+                                                      },
+                                                      itemBuilder: (context) => [
+                                                        const PopupMenuItem(
+                                                          value: 'download_qr',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(Icons.qr_code),
+                                                              SizedBox(width: 8),
+                                                              Text('Descargar QR'),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                    child: Text(
-                                                      coupon.isActive ? 'ACTIVO' : 'INACTIVO',
-                                                      style: TextStyle(
-                                                        color: coupon.isActive ? Colors.green.shade800 : Colors.grey.shade600,
-                                                        fontSize: 10,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
                                                 ],
+                                              ),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: coupon.isActive ? Colors.green.shade100 : Colors.grey.shade200,
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  coupon.isActive ? 'ACTIVO' : 'INACTIVO',
+                                                  style: TextStyle(
+                                                    color: coupon.isActive ? Colors.green.shade800 : Colors.grey.shade600,
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
                                               ),
                                               const SizedBox(height: 4),
                                               Text(

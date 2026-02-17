@@ -10,6 +10,7 @@ class StoreEntity {
   final double longitude;
   final String? phone;
   final bool isActive;
+  final String? qrUrl;
 
   const StoreEntity({
     required this.id,
@@ -20,6 +21,7 @@ class StoreEntity {
     required this.longitude,
     this.phone,
     this.isActive = true,
+    this.qrUrl,
   });
 
   /// Get full store name (Company - Branch)

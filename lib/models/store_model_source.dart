@@ -11,6 +11,7 @@ class StoreModel {
   final double longitude;
   final String? phone;
   final bool isActive;
+  final String? qrUrl;
 
   const StoreModel({
     required this.id,
@@ -21,6 +22,7 @@ class StoreModel {
     required this.longitude,
     this.phone,
     this.isActive = true,
+    this.qrUrl,
   });
 
   /// Convert from Firestore document
@@ -35,6 +37,7 @@ class StoreModel {
       longitude: (data['longitude'] ?? 0.0).toDouble(),
       phone: data['phone'],
       isActive: data['isActive'] ?? true,
+      qrUrl: data['qrUrl'],
     );
   }
 
@@ -48,6 +51,7 @@ class StoreModel {
       'longitude': longitude,
       if (phone != null) 'phone': phone,
       'isActive': isActive,
+      if (qrUrl != null) 'qrUrl': qrUrl,
     };
   }
 
@@ -62,6 +66,7 @@ class StoreModel {
       longitude: longitude,
       phone: phone,
       isActive: isActive,
+      qrUrl: qrUrl,
     );
   }
 
@@ -76,6 +81,7 @@ class StoreModel {
       longitude: entity.longitude,
       phone: entity.phone,
       isActive: entity.isActive,
+      qrUrl: entity.qrUrl,
     );
   }
 }

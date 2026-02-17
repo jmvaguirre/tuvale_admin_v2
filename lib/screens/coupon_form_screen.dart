@@ -50,7 +50,7 @@ class _CouponFormScreenState extends ConsumerState<CouponFormScreen> {
       _originalPriceController.text = c.originalPrice.toString();
       _discountedPriceController.text = c.discountedPrice.toString();
       _stockController.text = c.stock.toString();
-      _barcodeController.text = c.barcode;
+      _barcodeController.text = c.barcode ?? '';
       _validFrom = c.validFrom;
       _validUntil = c.validUntil;
       _isActive = c.isActive;
@@ -161,21 +161,47 @@ class _CouponFormScreenState extends ConsumerState<CouponFormScreen> {
         validUntil: _validUntil,
         stock: int.parse(_stockController.text),
         enabledStoreIds: _enabledStoreIds, 
-        barcode: _barcodeController.text.trim(),
+        barcode: _barcodeController.text.trim().isEmpty ? null : _barcodeController.text.trim(),
         isActive: _isActive,
         viewCount: widget.coupon?.viewCount ?? 0,
         imageUrl: imageUrl,
       );
 
       if (widget.coupon == null) {
-        await ref.read(firestoreServiceProvider).addCoupon(newCoupon);
+        // Adding new coupon
+        await ref.read(firestoreServiceProvider).addCoupon(
+          newCoupon,
+          storageService: ref.read(storageServiceProvider),
+        );
       } else {
+        // Updating existing coupon
         await ref.read(firestoreServiceProvider).updateCoupon(newCoupon);
       }
 
       if (mounted) {
         Navigator.pop(context);
-        UIHelpers.showSnackBar(context, 'Cupón guardado exitosamente');
+        
+        // Show warning if no stores selected
+        if (_enabledStoreIds.isEmpty) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              icon: const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 48),
+              title: const Text('Cupón guardado sin sucursales'),
+              content: const Text(
+                'El cupón se guardó correctamente, pero no será visible para los usuarios hasta que selecciones al menos una sucursal donde esté disponible.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Entendido'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          UIHelpers.showSnackBar(context, 'Cupón guardado exitosamente');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -297,8 +323,10 @@ class _CouponFormScreenState extends ConsumerState<CouponFormScreen> {
                           Expanded(
                             child: TextFormField(
                               controller: _barcodeController,
-                              decoration: const InputDecoration(labelText: 'Código de Barras', prefixIcon: Icon(Icons.qr_code)),
-                              validator: (v) => v!.isEmpty ? 'Requerido' : null,
+                              decoration: const InputDecoration(
+                                labelText: 'Código de Barras (Opcional)', 
+                                prefixIcon: Icon(Icons.qr_code)
+                              ),
                             ),
                           ),
                         ],

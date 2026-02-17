@@ -3,7 +3,8 @@ enum StoreCategory {
   supermercado('Supermercado', 'supermercado'),
   farmacia('Farmacia', 'farmacia'),
   restaurante('Restaurante', 'restaurante'),
-  moda('Moda', 'moda');
+  moda('Moda', 'moda'),
+  ferreteria('Ferretería', 'ferreteria');
 
   final String label;
   final String value;

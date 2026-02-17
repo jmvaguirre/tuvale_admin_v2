@@ -13,10 +13,11 @@ class CouponEntity {
   final int stock;
   final List<String> enabledStoreIds; // IDs of stores where this coupon is valid
   final bool isActive;
-  final String barcode; // Barcode for scanning at checkout
+  final String? barcode; // Barcode for scanning at checkout (optional)
   final bool isHero;
   final List<String> tags;
   final int viewCount;
+  final String? qrUrl;
 
   const CouponEntity({
     required this.id,
@@ -32,10 +33,11 @@ class CouponEntity {
     required this.stock,
     required this.enabledStoreIds,
     this.isActive = true,
-    required this.barcode,
+    this.barcode,
     this.isHero = false,
     this.tags = const [],
     this.viewCount = 0,
+    this.qrUrl,
   });
 
   /// Check if coupon is currently valid

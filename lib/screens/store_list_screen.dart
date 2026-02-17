@@ -1,8 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'package:gal/gal.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import 'store_form_screen.dart';
+
+// Download QR helper function
+Future<void> _downloadQr(BuildContext context, String qrUrl, String branchName) async {
+  try {
+    final response = await http.get(Uri.parse(qrUrl));
+    if (response.statusCode == 200) {
+      await Gal.putImageBytes(response.bodyBytes, album: 'TuVale');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('QR de "$branchName" descargado')),
+        );
+      }
+    }
+  } catch (e) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al descargar QR: $e')),
+      );
+    }
+  }
+}
 
 class StoreListScreen extends ConsumerWidget {
   const StoreListScreen({super.key});
@@ -47,7 +70,33 @@ class StoreListScreen extends ConsumerWidget {
                       ),
                       title: Text(store.branchName, style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(store.address, maxLines: 1, overflow: TextOverflow.ellipsis),
-                      trailing: const Icon(Icons.chevron_right),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (store.qrUrl != null)
+                            PopupMenuButton<String>(
+                              icon: const Icon(Icons.more_vert),
+                              onSelected: (value) {
+                                if (value == 'download_qr') {
+                                  _downloadQr(context, store.qrUrl!, store.branchName);
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 'download_qr',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.download, size: 20),
+                                      SizedBox(width: 8),
+                                      Text('Descargar QR'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          const Icon(Icons.chevron_right),
+                        ],
+                      ),
                       onTap: () {
                         Navigator.push(
                           context,

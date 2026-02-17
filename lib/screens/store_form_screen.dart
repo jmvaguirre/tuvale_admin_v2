@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/store_model_source.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
+import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import 'location_picker_screen.dart';
 
@@ -97,7 +98,10 @@ class _StoreFormScreenState extends ConsumerState<StoreFormScreen> {
       );
 
       if (widget.store == null) {
-        await ref.read(firestoreServiceProvider).addStore(newStore);
+        await ref.read(firestoreServiceProvider).addStore(
+          newStore,
+          storageService: ref.read(storageServiceProvider),
+        );
       } else {
         await ref.read(firestoreServiceProvider).updateStore(newStore);
       }

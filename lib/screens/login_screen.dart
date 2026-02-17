@@ -48,6 +48,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         final userProfile = await firestoreService.getUserStream(user.uid).first;
         
         if (userProfile != null && !userProfile.isActive) {
+           // Invalidate providers before logout
+           ref.invalidate(userProfileProvider);
+           ref.invalidate(companyCouponsProvider);
+           ref.invalidate(companyStoresProvider);
+           ref.invalidate(companyProfileProvider);
+           ref.invalidate(companyUsersProvider);
+           
            await authService.signOut();
            throw Exception('Esta cuenta ha sido bloqueada por un administrador.');
         }
