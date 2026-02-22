@@ -77,10 +77,11 @@ class FirestoreService {
   }
 
   Future<void> addCoupon(CouponModel coupon, {required StorageService storageService}) async {
-    // 1. Generate QR Code
+    // 1. Generate QR Code with redirection URL
     String? qrUrl;
     try {
-      final qrBytes = await QrGenerator.generateQrBytes(coupon.id);
+      final redirectionUrl = 'https://valeapp-flutter.web.app/#/product/${coupon.id}';
+      final qrBytes = await QrGenerator.generateQrBytes(redirectionUrl);
       if (qrBytes != null) {
         // 2. Upload to Storage
         qrUrl = await storageService.uploadQrCode(
@@ -182,10 +183,11 @@ class FirestoreService {
   }
 
   Future<void> addStore(StoreModel store, {required StorageService storageService}) async {
-    // 1. Generate QR Code with branch name
+    // 1. Generate QR Code with branch name and redirection URL
     String? qrUrl;
     try {
-      final qrBytes = await QrGenerator.generateQrBytesWithText(store.id, store.branchName);
+      final redirectionUrl = 'https://tuvale.app/s/${store.id}';
+      final qrBytes = await QrGenerator.generateQrBytesWithText(redirectionUrl, store.branchName);
       if (qrBytes != null) {
         // 2. Upload to Storage
         qrUrl = await storageService.uploadQrCode(

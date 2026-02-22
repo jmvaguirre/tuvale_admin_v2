@@ -1,18 +1,42 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QrGenerator {
+  static const String _logoPath = 'assets/images/tuvale_logo_new.jpg';
+
+  /// Loads an image from assets to be used in QR code
+  static Future<ui.Image?> _loadLogo() async {
+    try {
+      final data = await rootBundle.load(_logoPath);
+      final bytes = data.buffer.asUint8List();
+      final completer = Completer<ui.Image>();
+      ui.decodeImageFromList(bytes, (ui.Image img) => completer.complete(img));
+      return completer.future;
+    } catch (e) {
+      debugPrint('Error loading QR logo: $e');
+      return null;
+    }
+  }
+
   /// Generates a QR code image as Uint8List (PNG format) from the given [data].
   static Future<Uint8List?> generateQrBytes(String data) async {
     try {
+      final logo = await _loadLogo();
+      
       final image = await QrPainter(
         data: data,
         version: QrVersions.auto,
         gapless: false,
         color: const Color(0xFF000000),
         emptyColor: const Color(0xFFFFFFFF),
+        embeddedImage: logo,
+        embeddedImageStyle: const QrEmbeddedImageStyle(
+          size: Size(60, 60),
+        ),
       ).toImage(300); // 300x300 px
 
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
@@ -29,6 +53,8 @@ class QrGenerator {
       const textHeight = 60.0;
       const totalHeight = qrSize + textHeight;
 
+      final logo = await _loadLogo();
+
       // Generate QR code
       final qrImage = await QrPainter(
         data: data,
@@ -36,6 +62,10 @@ class QrGenerator {
         gapless: false,
         color: const Color(0xFF000000),
         emptyColor: const Color(0xFFFFFFFF),
+        embeddedImage: logo,
+        embeddedImageStyle: const QrEmbeddedImageStyle(
+          size: Size(60, 60),
+        ),
       ).toImage(300.0);
 
       // Create canvas with extra space for text
