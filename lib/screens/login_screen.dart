@@ -85,12 +85,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Logo Placeholder
+              // Logo
               const SizedBox(height: 40),
-              Icon(
-                Icons.admin_panel_settings,
-                size: 80,
-                color: theme.colorScheme.primary,
+              Image.asset(
+                'assets/images/tuvale_logo_admin.png',
+                height: 100,
               ),
               const SizedBox(height: 20),
               Text(
